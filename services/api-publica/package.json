@@ -1,0 +1,13 @@
+{
+  "name": "api-publica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interfaz publica para sistemas de terceros. Nunca lee directamente del nucleo interno (Kafka/Redis de tiempo-real): siempre pasa por tiempo-real como cualquier otro cliente, con su propio limite de tasa, para que un abuso de esta API no pueda tumbar el sistema interno.",
+  "main": "src/index.js",
+  "scripts": { "start": "node src/index.js" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "node-fetch": "^2.7.0"
+  }
+}

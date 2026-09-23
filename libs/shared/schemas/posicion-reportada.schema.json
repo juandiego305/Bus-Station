@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PosicionReportada",
+  "description": "Evento publicado por el gateway de ingesta cada vez que un bus reporta su posicion. Es el unico evento de entrada del sistema; todos los servicios de lectura son consumidores independientes de este mismo evento (ADR-000).",
+  "type": "object",
+  "required": ["evento_id", "bus_id", "ruta_id", "timestamp", "lat", "lon", "velocidad_kmh", "estado"],
+  "properties": {
+    "evento_id": {
+      "type": "string",
+      "description": "Clave de idempotencia: `${bus_id}:${timestamp}`. Todo consumidor debe usar esta clave para no procesar el mismo evento dos veces."
+    },
+    "bus_id": { "type": "string" },
+    "ruta_id": { "type": "string" },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Instante en que el GPS tomo la lectura (no el instante en que llega al servidor; puede llegar hasta 3 minutos tarde o desordenado)."
+    },
+    "lat": { "type": "number" },
+    "lon": { "type": "number" },
+    "velocidad_kmh": { "type": "number" },
+    "estado": {
+      "type": "string",
+      "enum": ["EN_RUTA", "DETENIDO", "FUERA_DE_RUTA", "SIN_SENAL"]
+    }
+  }
+}

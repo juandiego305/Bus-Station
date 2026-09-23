@@ -1,0 +1,13 @@
+{
+  "name": "historico",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Consume PosicionReportada y persiste cada evento sin descartar, en un almacenamiento orientado a analitica, para los reportes de puntualidad y frecuencia del ente gestor.",
+  "main": "src/index.js",
+  "scripts": { "start": "node src/index.js" },
+  "dependencies": {
+    "@transporte-vivo/shared": "file:../../libs/shared",
+    "kafkajs": "^2.2.4",
+    "pg": "^8.12.0"
+  }
+}

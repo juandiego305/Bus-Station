@@ -1,0 +1,12 @@
+{
+  "name": "reportes",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API de solo lectura sobre el almacenamiento historico. Consultada por el ente gestor; nunca escribe, nunca compite con la ingesta.",
+  "main": "src/index.js",
+  "scripts": { "start": "node src/index.js" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "tiempo-real",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Consume PosicionReportada, mantiene el ultimo estado conocido de cada bus y lo sirve al mapa en vivo (baja latencia, consistencia eventual).",
+  "main": "src/index.js",
+  "scripts": { "start": "node src/index.js" },
+  "dependencies": {
+    "@transporte-vivo/shared": "file:../../libs/shared",
+    "express": "^4.19.2",
+    "kafkajs": "^2.2.4",
+    "ioredis": "^5.4.1"
+  }
+}

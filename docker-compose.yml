@@ -1,0 +1,94 @@
+version: "3.8"
+
+services:
+  # --- Infraestructura ---
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on: [zookeeper]
+    ports: ["9092:9092"]
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: transporte
+      POSTGRES_PASSWORD: transporte
+      POSTGRES_DB: transporte_vivo
+    ports: ["5432:5432"]
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # --- Servicios (uno por consumidor del flujo, ver docs/flujo-transporte.md) ---
+  gateway-ingesta:
+    build: ./services/gateway-ingesta
+    depends_on: [kafka]
+    ports: ["3001:3001"]
+    environment:
+      KAFKA_BROKERS: kafka:9092
+      PUERTO: 3001
+
+  tiempo-real:
+    build: ./services/tiempo-real
+    depends_on: [kafka, redis]
+    ports: ["3002:3002"]
+    environment:
+      KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://redis:6379
+      PUERTO: 3002
+
+  estimador-llegadas:
+    build: ./services/estimador-llegadas
+    depends_on: [kafka, redis]
+    ports: ["3003:3003"]
+    environment:
+      KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://redis:6379
+      PUERTO: 3003
+
+  alertas:
+    build: ./services/alertas
+    depends_on: [kafka, redis]
+    ports: ["3004:3004"]
+    environment:
+      KAFKA_BROKERS: kafka:9092
+      REDIS_URL: redis://redis:6379
+      PUERTO: 3004
+
+  historico:
+    build: ./services/historico
+    depends_on: [kafka, postgres]
+    environment:
+      KAFKA_BROKERS: kafka:9092
+      DATABASE_URL: postgres://transporte:transporte@postgres:5432/transporte_vivo
+
+  reportes:
+    build: ./services/reportes
+    depends_on: [postgres]
+    ports: ["3006:3006"]
+    environment:
+      DATABASE_URL: postgres://transporte:transporte@postgres:5432/transporte_vivo
+      PUERTO: 3006
+
+  api-publica:
+    build: ./services/api-publica
+    depends_on: [tiempo-real]
+    ports: ["3005:3005"]
+    environment:
+      TIEMPO_REAL_URL: http://tiempo-real:3002
+      PUERTO: 3005
+
+volumes:
+  postgres_data:

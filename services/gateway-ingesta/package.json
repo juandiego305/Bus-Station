@@ -1,0 +1,16 @@
+{
+  "name": "gateway-ingesta",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Recibe la posicion del GPS de cada bus y la publica como evento. No calcula nada, no espera a nadie: solo valida forma y publica.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "@transporte-vivo/shared": "file:../../libs/shared",
+    "express": "^4.19.2",
+    "kafkajs": "^2.2.4"
+  }
+}
