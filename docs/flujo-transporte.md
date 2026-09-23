@@ -24,6 +24,14 @@ Los 5 pasos parten de un mismo evento de entrada (`PosicionReportada`) y se resu
 
 Los cinco pasos son distintos consumidores de un mismo evento de entrada, no una cadena de llamadas donde cada paso depende del resultado del anterior. Esto es consistente con la tensión principal del caso (Escenario 1: ingestión sostenida a 90 eventos/s) y con la decisión ya tomada en el ADR-000: aislar la escritura (el GPS reportando) de los distintos consumidores de lectura (mapa, estimación, alertas, histórico), para que un consumidor lento o caído no atrase ni bloquee a los demás ni al GPS.
 
+La llamada GPS → Gateway sí es una petición HTTP que espera un ACK: el ACK confirma que Kafka aceptó el evento de forma durable, no que mapa, estimación, alertas o histórico ya terminaron. Por eso la comunicación entre el GPS y la ingesta espera respuesta, mientras que el procesamiento posterior es asíncrono.
+
 La única operación síncrona del caso —la consulta del usuario en la app preguntando "¿cuánto falta?"— **no forma parte de este flujo**: es un flujo de lectura aparte que consulta el último estado ya calculado, sin tocar la ingesta.
 
 Ningún paso de este flujo tiene una compensación tipo "deshacer": no hay dinero cobrado ni cupo reservado que revertir. Lo que cada consumidor debe garantizar es que reintentar (por el bus/log de eventos) no duplique efectos hacia afuera, de ahí la columna de idempotencia en cada fila.
+
+## Vista de contenedores
+
+El DSL C4 del proyecto está en [`contenedores.dsl`](contenedores.dsl). Imagen de la vista:
+
+![Vista de contenedores C4 del sistema de transporte](img/Contenedores.png)

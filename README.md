@@ -68,4 +68,4 @@ for s in services/*/; do (cd "$s" && npm install); done
 
 - El **porqué** de la arquitectura: `docs/adr/ADR-000-arquitectura-eventos.md`
 - El **flujo paso a paso** con síncrono/evento/idempotencia: `docs/flujo-transporte.md`
-- El **diagrama de contenedores**: `docs/contenedores.dsl`
+- La **vista de contenedores C4** (DSL e imagen): `docs/contenedores.dsl` y `docs/img/Contenedores.png`
