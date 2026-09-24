@@ -1,8 +1,8 @@
 FROM node:20-alpine
 WORKDIR /app
-COPY ../../libs/shared ./libs/shared
-COPY package.json ./
+COPY libs/shared ./libs/shared
+RUN cd libs/shared && npm install --omit=dev
+COPY services/gateway-ingesta ./services/gateway-ingesta
+WORKDIR /app/services/gateway-ingesta
 RUN npm install --omit=dev
-COPY src ./src
-EXPOSE 3001
 CMD ["node", "src/index.js"]

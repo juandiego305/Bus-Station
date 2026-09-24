@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # --- Infraestructura ---
   zookeeper:
@@ -33,7 +31,9 @@ services:
 
   # --- Servicios (uno por consumidor del flujo, ver docs/flujo-transporte.md) ---
   gateway-ingesta:
-    build: ./services/gateway-ingesta
+    build:
+      context: .
+      dockerfile: services/gateway-ingesta/Dockerfile
     depends_on: [kafka]
     ports: ["3001:3001"]
     environment:
@@ -41,7 +41,9 @@ services:
       PUERTO: 3001
 
   tiempo-real:
-    build: ./services/tiempo-real
+    build:
+      context: .
+      dockerfile: services/tiempo-real/Dockerfile
     depends_on: [kafka, redis]
     ports: ["3002:3002"]
     environment:
@@ -50,7 +52,9 @@ services:
       PUERTO: 3002
 
   estimador-llegadas:
-    build: ./services/estimador-llegadas
+    build:
+      context: .
+      dockerfile: services/estimador-llegadas/Dockerfile
     depends_on: [kafka, redis]
     ports: ["3003:3003"]
     environment:
@@ -59,7 +63,9 @@ services:
       PUERTO: 3003
 
   alertas:
-    build: ./services/alertas
+    build:
+      context: .
+      dockerfile: services/alertas/Dockerfile
     depends_on: [kafka, redis]
     ports: ["3004:3004"]
     environment:
@@ -68,14 +74,18 @@ services:
       PUERTO: 3004
 
   historico:
-    build: ./services/historico
+    build:
+      context: .
+      dockerfile: services/historico/Dockerfile
     depends_on: [kafka, postgres]
     environment:
       KAFKA_BROKERS: kafka:9092
       DATABASE_URL: postgres://transporte:transporte@postgres:5432/transporte_vivo
 
   reportes:
-    build: ./services/reportes
+    build:
+      context: .
+      dockerfile: services/reportes/Dockerfile
     depends_on: [postgres]
     ports: ["3006:3006"]
     environment:
@@ -83,7 +93,9 @@ services:
       PUERTO: 3006
 
   api-publica:
-    build: ./services/api-publica
+    build:
+      context: .
+      dockerfile: services/api-publica/Dockerfile
     depends_on: [tiempo-real]
     ports: ["3005:3005"]
     environment:
