@@ -13,6 +13,10 @@ function crearCliente(clientId) {
   return new Kafka({
     clientId,
     brokers: (process.env.KAFKA_BROKERS || 'kafka:9092').split(','),
+    retry: {
+      initialRetryTime: 1000,
+      retries: 8,
+    },
     logLevel: logLevel.WARN,
   });
 }
@@ -31,14 +35,26 @@ function crearConsumidorIdempotente({ clientId, groupId, topic, onEvento, verEve
     await consumer.subscribe({ topic, fromBeginning: false });
     await consumer.run({
       eachMessage: async ({ message }) => {
-        const evento = JSON.parse(message.value.toString());
+        let evento;
+        try {
+          evento = JSON.parse(message.value.toString());
 
-        // Idempotencia: si ya procesamos este evento_id, lo ignoramos.
-        const yaProcesado = await verEventoProcesado(evento.evento_id);
-        if (yaProcesado) return;
+          // Idempotencia: si ya procesamos este evento_id, lo ignoramos.
+          const yaProcesado = await verEventoProcesado(evento.evento_id);
+          if (yaProcesado) return;
 
-        await onEvento(evento);
-        await marcarEventoProcesado(evento.evento_id);
+          await onEvento(evento);
+          await marcarEventoProcesado(evento.evento_id);
+        } catch (err) {
+          console.error('fallo procesando evento Kafka', {
+            clientId,
+            groupId,
+            eventoId: evento?.evento_id,
+            error: err.message,
+          });
+          // KafkaJS reintenta el mensaje y conserva el offset sin confirmar.
+          throw err;
+        }
       },
     });
   }

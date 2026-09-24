@@ -1,0 +1,7 @@
+{
+  "name": "bus-station-tests",
+  "private": true,
+  "scripts": {
+    "test:integration": "node --test test/integration.test.js"
+  }
+}

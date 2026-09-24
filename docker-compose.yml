@@ -45,7 +45,7 @@ services:
       POSTGRES_USER: transporte
       POSTGRES_PASSWORD: transporte
       POSTGRES_DB: transporte_vivo
-    ports: ["5432:5432"]
+    ports: ["5433:5432"]
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -67,6 +67,12 @@ services:
     environment:
       KAFKA_BROKERS: kafka:9092
       PUERTO: 3001
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   tiempo-real:
     build:
@@ -82,6 +88,12 @@ services:
       KAFKA_BROKERS: kafka:9092
       REDIS_URL: redis://redis:6379
       PUERTO: 3002
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3002/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   estimador-llegadas:
     build:
@@ -97,6 +109,12 @@ services:
       KAFKA_BROKERS: kafka:9092
       REDIS_URL: redis://redis:6379
       PUERTO: 3003
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3003/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   alertas:
     build:
@@ -112,6 +130,12 @@ services:
       KAFKA_BROKERS: kafka:9092
       REDIS_URL: redis://redis:6379
       PUERTO: 3004
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3004/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   historico:
     build:
@@ -125,6 +149,12 @@ services:
     environment:
       KAFKA_BROKERS: kafka:9092
       DATABASE_URL: postgres://transporte:transporte@postgres:5432/transporte_vivo
+    healthcheck:
+      test: ["CMD", "node", "-e", "const { Client } = require('pg'); const client = new Client({ connectionString: process.env.DATABASE_URL }); client.connect().then(() => client.end()).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   reportes:
     build:
@@ -137,6 +167,12 @@ services:
     environment:
       DATABASE_URL: postgres://transporte:transporte@postgres:5432/transporte_vivo
       PUERTO: 3006
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3006/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   api-publica:
     build:
@@ -144,11 +180,17 @@ services:
       dockerfile: services/api-publica/Dockerfile
     depends_on:
       tiempo-real:
-        condition: service_started
+        condition: service_healthy
     ports: ["3005:3005"]
     environment:
       TIEMPO_REAL_URL: http://tiempo-real:3002
       PUERTO: 3005
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3005/salud').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
 volumes:
   postgres_data:

@@ -78,6 +78,38 @@ curl http://localhost:3004/alertas/activas           # alertas (vacío si no hay
 curl http://localhost:3005/v1/rutas/ruta-1/buses     # API pública
 ```
 
+Para simular 10 buses enviando una posición cada 4 segundos, desde PowerShell:
+
+```powershell
+.\scripts\simular-gps.ps1
+```
+
+El simulador continúa hasta presionar `Ctrl+C`. Para ejecutar solo dos ciclos:
+
+```powershell
+.\scripts\simular-gps.ps1 -Ciclos 2
+```
+
+Para simular una pérdida de red desde el ciclo 2 durante 7 ciclos (28
+segundos), y después reanudar el envío:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\simular-gps.ps1 `
+  -Ciclos 10 -CicloInicioSinRed 2 -CiclosSinRed 7
+```
+
+Durante la pausa no se publican posiciones. `tiempo-real` conserva el último
+estado conocido y el watchdog de `alertas` puede generar `SIN_REPORTAR`; al
+volver la red, el siguiente ciclo reanuda la propagación.
+
+Con los contenedores levantados, la prueba de integración verifica salud,
+ingesta, fan-out hacia tiempo real/ETA/alertas, API pública, histórico y
+validación de entrada:
+
+```powershell
+npm run test:integration
+```
+
 ## Instalar dependencias por servicio (desarrollo sin Docker)
 
 Cada servicio referencia `libs/shared` como dependencia local
