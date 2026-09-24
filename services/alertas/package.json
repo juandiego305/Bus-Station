@@ -4,7 +4,10 @@
   "private": true,
   "description": "Consume PosicionReportada, detecta anomalias (detenido, fuera de ruta, sin reportar) y notifica al operador de flota, sin duplicar la misma alerta.",
   "main": "src/index.js",
-  "scripts": { "start": "node src/index.js" },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js"
+  },
   "dependencies": {
     "@transporte-vivo/shared": "file:../../libs/shared",
     "express": "^4.19.2",

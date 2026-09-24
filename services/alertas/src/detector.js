@@ -10,6 +10,9 @@ function detectarAnomalia(evento) {
   if (evento.estado === 'FUERA_DE_RUTA') {
     return { tipo: 'FUERA_DE_RUTA', bus_id: evento.bus_id, ruta_id: evento.ruta_id };
   }
+  if (evento.estado === 'SIN_REPORTAR') {
+    return { tipo: 'SIN_REPORTAR', bus_id: evento.bus_id, ruta_id: evento.ruta_id };
+  }
   return null;
 }
 
