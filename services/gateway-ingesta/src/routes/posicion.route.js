@@ -1,5 +1,6 @@
 const express = require('express');
 const { TOPICS } = require('@transporte-vivo/shared/kafka-client');
+const { validarPosicion } = require('@transporte-vivo/shared/validador');
 
 const router = express.Router();
 
@@ -12,10 +13,6 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   const { bus_id, ruta_id, timestamp, lat, lon, velocidad_kmh, estado } = req.body;
 
-  if (!bus_id || !timestamp || lat === undefined || lon === undefined) {
-    return res.status(400).json({ error: 'faltan campos obligatorios' });
-  }
-
   const evento = {
     // Clave de idempotencia para todos los consumidores.
     evento_id: `${bus_id}:${timestamp}`,
@@ -25,8 +22,18 @@ router.post('/', async (req, res) => {
     lat,
     lon,
     velocidad_kmh,
-    estado: estado || 'EN_RUTA',
+    estado,
   };
+
+  if (!validarPosicion(evento)) {
+    const detalles = validarPosicion.errors.map((error) => ({
+      campo: error.params.missingProperty || error.instancePath.replace('/', '') || 'evento',
+      regla: error.keyword,
+      detalle: error.message,
+    }));
+
+    return res.status(400).json({ error: 'validacion_fallida', detalles });
+  }
 
   const productor = req.app.get('productor');
   try {
