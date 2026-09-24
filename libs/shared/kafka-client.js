@@ -21,6 +21,22 @@ function crearCliente(clientId) {
   });
 }
 
+function parsearEvento(messageValue) {
+  if (!messageValue) return null;
+
+  try {
+    const evento = JSON.parse(messageValue.toString());
+
+    if (!evento || typeof evento !== 'object' || !evento.evento_id) {
+      return null;
+    }
+
+    return evento;
+  } catch (error) {
+    return null;
+  }
+}
+
 /**
  * Crea un consumer con un groupId propio (cada servicio es un grupo distinto,
  * asi el log se reparte y no se compite por el mismo evento) y expone un
@@ -37,7 +53,8 @@ function crearConsumidorIdempotente({ clientId, groupId, topic, onEvento, verEve
       eachMessage: async ({ message }) => {
         let evento;
         try {
-          evento = JSON.parse(message.value.toString());
+          evento = parsearEvento(message.value);
+          if (!evento) return;
 
           // Idempotencia: si ya procesamos este evento_id, lo ignoramos.
           const yaProcesado = await verEventoProcesado(evento.evento_id);
@@ -69,4 +86,4 @@ async function crearProductor(clientId) {
   return producer;
 }
 
-module.exports = { TOPICS, crearCliente, crearConsumidorIdempotente, crearProductor };
+module.exports = { TOPICS, crearCliente, crearConsumidorIdempotente, crearProductor, parsearEvento };
