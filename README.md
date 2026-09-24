@@ -22,6 +22,30 @@ Cada servicio consumidor de Kafka usa su propio `groupId` (ver
 sin que compitan entre sí, y cada uno decide su propia idempotencia según la
 tabla del paso 2 del flujo.
 
+## Matriz arquitectónica
+
+| Bloque | Servicio | Responsabilidad | Endpoint | Tecnología | Puerto |
+|---|---|---|---|---|---:|
+| Ingesta | `gateway-ingesta` | Recibe posiciones GPS y publica eventos | `POST /posiciones` | Express + KafkaJS | 3001 |
+| Broker + eventos | `kafka` | Distribuye eventos a los consumidores | Interno | Kafka | 9092 |
+| Tiempo real / caché | `tiempo-real` | Mantiene el último estado conocido de cada bus | `GET /buses/:busId`, `GET /buses/ruta/:rutaId` | Express + KafkaJS + Redis | 3002 |
+| Estimación | `estimador-llegadas` | Calcula tiempos estimados de llegada | `GET /llegadas/:rutaId/:paradaId` | Express + KafkaJS + Redis | 3003 |
+| Alertas | `alertas` | Detecta buses detenidos, fuera de ruta o sin reportar | `GET /alertas/activas` | Express + KafkaJS + Redis | 3004 |
+| Histórico | `historico` | Guarda las posiciones en PostgreSQL | Interno, consumidor Kafka | KafkaJS + PostgreSQL | — |
+| API de lectura | `api-publica` | Expone información para clientes externos | `GET /v1/rutas/:rutaId/buses` | Express + `node-fetch` | 3005 |
+| Reportes | `reportes` | Consulta información histórica y genera reportes | `GET /reportes/frecuencia/:rutaId`, `GET /reportes/puntualidad/:rutaId` | Express + PostgreSQL | 3006 |
+
+## Infraestructura de soporte
+
+| Componente | Función | Puerto |
+|---|---|---:|
+| `zookeeper` | Coordina Kafka | 2181 |
+| `redis` | Almacena caché, estado en tiempo real, ETA y alertas | 6379 |
+| `postgres` | Almacena el histórico de posiciones | 5432 |
+
+No falta ningún bloque principal de la arquitectura. `reportes` es un servicio
+adicional de lectura que complementa la `api-publica` con consultas históricas.
+
 ## Cómo correr localmente
 
 ```bash

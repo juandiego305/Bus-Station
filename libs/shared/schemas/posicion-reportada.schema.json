@@ -9,19 +9,20 @@
       "type": "string",
       "description": "Clave de idempotencia: `${bus_id}:${timestamp}`. Todo consumidor debe usar esta clave para no procesar el mismo evento dos veces."
     },
-    "bus_id": { "type": "string" },
-    "ruta_id": { "type": "string" },
+    "bus_id": { "type": "string", "minLength": 1 },
+    "ruta_id": { "type": "string", "minLength": 1 },
     "timestamp": {
       "type": "string",
       "format": "date-time",
       "description": "Instante en que el GPS tomo la lectura (no el instante en que llega al servidor; puede llegar hasta 3 minutos tarde o desordenado)."
     },
-    "lat": { "type": "number" },
-    "lon": { "type": "number" },
-    "velocidad_kmh": { "type": "number" },
+    "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+    "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+    "velocidad_kmh": { "type": "number", "minimum": 0, "maximum": 300 },
     "estado": {
       "type": "string",
       "enum": ["EN_RUTA", "DETENIDO", "FUERA_DE_RUTA", "SIN_SENAL"]
     }
-  }
+  },
+  "additionalProperties": false
 }
