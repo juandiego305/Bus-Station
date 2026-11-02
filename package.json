@@ -2,6 +2,10 @@
   "name": "bus-station-tests",
   "private": true,
   "scripts": {
+    "test": "node test/escenario-desorden.js con-falla",
+    "escenario": "node test/escenario-desorden.js con-falla",
+    "escenario:sin-falla": "node test/escenario-desorden.js sin-falla",
+    "escenario:reloj-adelantado": "node test/escenario-desorden.js reloj-adelantado",
     "test:integration": "node --test test/integration.test.js"
   }
 }
