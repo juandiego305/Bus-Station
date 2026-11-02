@@ -14,6 +14,7 @@ Las fuerzas que pesan en esta decisión, tomadas del caso:
 - **El dato de llegada se refresca cada 15 segundos (RF-03).** Si la respuesta del modelo tarda más que eso, el usuario recibe una estimación que ya cambió. El tiempo máximo de espera del modelo tiene que ser bastante menor que 15 s.
 - **El presupuesto está topado por contrato** y un mismo dato lo leen miles de usuarios (escenario 2, fan-out). Si cada consulta del mapa o de las pantallas pasara por el modelo, el costo crecería con cada lector, que es justo lo que el ADR-000 quiso evitar.
 - **Las 40 pantallas de estación ya saben en qué parada están.** Para ellas no hay nada que interpretar.
+- **Datos que recibe el modelo.** Para proponer `parada_id` el modelo necesita conocer las paradas, así que recibe el texto de la pregunta y el catálogo público de rutas y paradas (identificador, nombre oficial y nombres populares). No recibe la ubicación del usuario, su identidad ni posiciones de buses: el dato vivo se queda en el estimador. Así, lo que sale hacia el proveedor externo es información que ya es pública.
 - **El modelo solo debe leer.** Consultar una llegada no cobra ni reserva nada, así que un error no es irreversible: el costo de equivocarse es una mala información, no una pérdida de dinero.
 - **¿Se resuelve con un `if`?** Parcialmente. Una tabla de sinónimos de paradas resuelve los nombres conocidos, pero no las frases libres ("el que pasa por la terminal", "el de las 7 que va lleno").
 
@@ -26,7 +27,7 @@ Supuestos declarados (el caso no da estos datos):
 
 Se usa un modelo de lenguaje **solo en la caja de texto libre de la app**, con el patrón **tool-calling + guardrails**:
 
-1. El contenedor nuevo *Asistente de consultas* envía la pregunta al proveedor del modelo junto con **una única herramienta**: `consultarLlegada(ruta_id, parada_id)`, que es de solo lectura.
+1. El contenedor nuevo *Asistente de consultas* envía la pregunta y el catálogo de rutas y paradas al proveedor del modelo junto con **una única herramienta**: `consultarLlegada(ruta_id, parada_id)`, que es de solo lectura.
 2. El modelo no responde el tiempo de llegada; solo **propone** la llamada con una ruta y una parada.
 3. El código del asistente (guardrails) valida la propuesta antes de ejecutarla: la ruta existe, la parada existe y pertenece a esa ruta, y la herramienta es la única permitida.
 4. Si la propuesta es válida, el asistente llama al estimador de llegadas existente y la app muestra el resultado, siempre con el nombre de la parada interpretada ("Llegada a la parada *Hospital Erasmo Meoz*: 6 min"), para que el usuario vea qué entendió el sistema.
