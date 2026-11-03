@@ -34,18 +34,19 @@ La comparación se hace con `Date.parse`, es decir, entre instantes y no entre t
 
 ## Costo medido
 
-Medido en el computador de **[TU NOMBRE]** ([CPU], [RAM], Node [versión], [sistema operativo]), con `npm run escenario` (modo `con-falla`), 5 corridas por versión. Tiempo por evento, en µs:
+Medido en el computador de **[JUAN DAVID QUINTERO MELO]** (**[AMD RYZEN 3600 6-CORE ]**, **[16 GB RAM]**, Node [v24.16.0], **[WINDOWS 11]**), con `npm run escenario` (modo `con-falla`), 5 corridas por versión. Tiempo por evento, en µs:
 
 | Corrida | Con táctica: promedio | Con táctica: p99 | Sin táctica: promedio | Sin táctica: p99 |
 | ------- | --------------------- | ---------------- | --------------------- | ---------------- |
-| 1       | [ ]                   | [ ]              | [ ]                   | [ ]              |
-| 2       | [ ]                   | [ ]              | [ ]                   | [ ]              |
-| 3       | [ ]                   | [ ]              | [ ]                   | [ ]              |
-| 4       | [ ]                   | [ ]              | [ ]                   | [ ]              |
-| 5       | [ ]                   | [ ]              | [ ]                   | [ ]              |
-| **Promedio de las 5** | **[ ]** | **[ ]**       | **[ ]**               | **[ ]**          |
+| 1       | [  1.31 µs ]          | [2.50 µs ]       | [ 0.61 µs ]           | [ 1.10 µs ]      |
+| 2       | [  1.26 µs ]          | [3.90 µs ]       | [ 0.70 µs ]           | [ 1.90 µs ]      |
+| 3       | [  1.35 µs ]          | [2.70 µs ]       | [ 0.71 µs ]           | [ 1.60 µs ]      |
+| 4       | [  1.29 µs ]          | [2.80 µs ]       | [ 0.70 µs ]           | [ 1.60 µs ]      |
+| 5       | [  1.30 µs ]          | [2.60 µs ]       | [ 0.72 µs ]           | [ 2.00 µs ]      |
+| **Promedio de las 5** |
+          |**[ 1.30 µs ]**        | **[ 2.90 µs ]**  | **[ 0.69 µs ]**       | **[ 1.64 µs ]**  |
 
-Diferencia: la táctica suma **[ ] µs** al promedio y **[ ] µs** al p99 por evento. Con el repositorio en memoria el costo es una lectura de un `Map`; con Redis (servicio `tiempo-real`) la lectura será una ida a la red, y ese costo no está medido aquí.
+Diferencia: la táctica suma **[ 0.61 µs ] ** al promedio y **[ 1.26 µs ]** al p99 por evento. Con el repositorio en memoria el costo es una lectura de un `Map`; con Redis (servicio `tiempo-real`) la lectura será una ida a la red, y ese costo no está medido aquí.
 
 Resultado del escenario según la versión (modo `con-falla`):
 
