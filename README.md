@@ -14,16 +14,18 @@ independientes de ese evento, cada uno con su propio contrato de consistencia.
 
 **Consistencia del camino en vivo frente a eventos atrasados y duplicados.**
 
-> En una ventana de **3 minutos** de operación (350 buses, un reporte cada 4 s =
-> **15.750 eventos**), con el **20 %** de los eventos atrasados hasta 180 s y el
-> **10 %** duplicados, el **100 %** de los buses queda con su posición más reciente
-> y el operador recibe **0 alertas duplicadas**.
+> En una ventana de **3 minutos** (350 buses, un reporte cada 4 s), la prueba recibe
+> **17.312 eventos**: **15.750 reportes originales** más **1.562 reenvíos duplicados**.
+> Con el 20 % de los reportes atrasados hasta 180 s, los 350 buses conservan su
+> posición más reciente y el operador recibe **0 alertas duplicadas**.
 
 **Origen de los números.** 350 buses y un reporte cada 4 s salen del caso (ADR-000).
-La ventana de 3 minutos es el atraso máximo de la red celular que da el caso, así que
-cubre el peor atraso posible; 180 s / 4 s = 45 reportes por bus × 350 = 15.750 eventos.
-El 20 % de atrasados y el 10 % de duplicados son **supuestos del grupo**, porque el caso
-no da esos porcentajes (declarados en `src/adaptadores/gps-simulado.js`).
+La ventana de 3 minutos cubre el atraso máximo de la red celular que da el caso:
+180 s / 4 s = 45 reportes por bus × 350 = 15.750 reportes originales. La semilla fija
+del simulador selecciona 1.562 de esos reportes para reenviarlos, por eso el total
+recibido es 17.312; el conteo se confirma al ejecutar `npm run escenario`. El 20 % de
+atrasados y el 10 % de duplicados son **supuestos del grupo**, pues el caso no da esos
+porcentajes (declarados en `src/adaptadores/gps-simulado.js`).
 
 **Por qué este y no los otros dos escenarios de [`docs/vision.md`](docs/vision.md):**
 
@@ -39,6 +41,23 @@ no da esos porcentajes (declarados en `src/adaptadores/gps-simulado.js`).
   restricción explícita del caso (red celular con eventos desordenados hasta 3 min), el
   ADR-000 dejó la decisión abierta, y la falla se reproduce a voluntad con un simulador
   con semilla fija.
+
+### Límites y pendientes conocidos
+
+- **Carga sostenida de 90 eventos/s:** esta prueba procesa la ráfaga local de 17.312
+  eventos, pero no controla esa tasa durante 16 horas ni publica la carga en Kafka.
+  La meta de 90 eventos/s sigue sin demostrarse contra la ingesta real.
+- **Timestamps futuros en el Gateway:** el Gateway valida el formato de fecha, pero no
+  rechaza explícitamente timestamps posteriores a la hora de recepción. El escenario
+  `reloj-adelantado` mide la limitación de la táctica de tiempo real; no verifica esa
+  regla en el endpoint del Gateway.
+- **Alertas atrasadas:** falta definir y aplicar una política para alertar sobre
+  posiciones que llegan tarde. La prueba confirma cero duplicados, pero no demuestra
+  que una anomalía contenida en un evento atrasado se notifique al operador.
+- **Caso de uso y servicios reales:** `procesar-posicion.js` se prueba con adaptadores
+  en memoria. Las pruebas de integración ejercitan los servicios Docker por separado;
+  falta conectar ese caso de uso al Gateway, Kafka y consumidores reales de extremo a
+  extremo.
 
 **Camino en la vista de contenedores** (flechas rojas en
 [`docs/img/Contenedores.png`](docs/img/Contenedores.png)):
@@ -80,7 +99,7 @@ npm run guardrails                   # ADR-002: guardrails y timeout del modelo 
 | Luis Soto | `lesg1151860` | Adaptador simulado del modelo, guardrails y su prueba | [ ] |
 | Yefferson Delgado | `YeffersonDelgado` | Táctica last-write-wins en `procesar-posicion.js` | [ ] |
 | Juan David Quientero | `Juanda-quitero27` | ADR-003 con el costo medido | [ ] |
-| Yarley Gillen | `YGGR29` | [ ] | [ ] |
+| Yarley Guillen | `YGGR29` | DSL de la vista C4 de contenedores (`docs/contenedores.dsl`, commit `96f1c59`) | [ ] |
 
 ## Dónde está cada decisión
 
