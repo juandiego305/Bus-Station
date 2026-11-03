@@ -87,6 +87,8 @@ La prueba se corre con un **adaptador simulado del modelo** con respuestas prede
 
 Ejecutar los guardrails automatizados: `npm run guardrails`.
 
+La prueba acepta una propuesta válida, rechaza las 4 propuestas inválidas (herramienta no permitida, ruta inexistente, parada inexistente o de otra ruta) y verifica que, si el modelo no responde en 2 s, el flujo termina en el selector.
+
 ## Consecuencias
 
 **Mejora:**
