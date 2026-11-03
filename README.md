@@ -76,11 +76,11 @@ npm run guardrails                   # ADR-002: guardrails y timeout del modelo 
 | Integrante | GitHub | Aporte | Parte del video |
 |---|---|---|---|
 | Juan Diego Contreras Garcia | `juandiego305` | Estructura inicial, flujo de transporte, imagen de la vista de contenedores | 1. El escenario |
-| [NOMBRE] | `Javier Guerrero` | ADR-002, proveedor del modelo en `contenedores.dsl`, prueba del escenario que falla | [ ] |
-| [NOMBRE] | `lesg1151860` | Adaptador simulado del modelo, guardrails y su prueba | [ ] |
+| [Javier Guerrero] | `Javier Guerrero` | ADR-002, proveedor del modelo en `contenedores.dsl`, prueba del escenario que falla | [ ] |
+| [Luis Soto] | `lesg1151860` | Adaptador simulado del modelo, guardrails y su prueba | [ ] |
 | Yefferson Delgado | `YeffersonDelgado` | Táctica last-write-wins en `procesar-posicion.js` | [ ] |
-| [NOMBRE] | `Juanda-quitero27` | ADR-003 con el costo medido | [ ] |
-| [NOMBRE] | `YGGR29` | [ ] | [ ] |
+| [Juan David Quientero] | `Juanda-quitero27` | ADR-003 con el costo medido | [ ] |
+| [Yarley Gillen] | `YGGR29` | [ ] | [ ] |
 
 ## Dónde está cada decisión
 
