@@ -85,6 +85,8 @@ Hay un error que el guardrail no puede detectar: que el modelo proponga una para
 
 La prueba se corre con un **adaptador simulado del modelo** con respuestas predefinidas; no es obligatorio conectar un proveedor real.
 
+Ejecutar los guardrails automatizados: `npm run guardrails`.
+
 ## Consecuencias
 
 **Mejora:**
