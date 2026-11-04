@@ -34,30 +34,40 @@ La comparación se hace con `Date.parse`, es decir, entre instantes y no entre t
 
 ## Costo medido
 
-Medido en el computador de **[JUAN DAVID QUINTERO MELO]** (**[AMD RYZEN 3600 6-CORE ]**, **[16 GB RAM]**, Node [v24.16.0], **[WINDOWS 11]**), con `npm run escenario` (modo `con-falla`), 5 corridas por versión. Tiempo por evento, en µs:
+Medido en el computador de **Juan David Quintero Melo** (AMD Ryzen 3600 6-Core, 16 GB RAM, Node v24.16.0, Windows 11), con `npm run escenario` (modo `con-falla`), 5 corridas por versión. Tiempo por evento, en µs:
 
 | Corrida | Con táctica: promedio | Con táctica: p99 | Sin táctica: promedio | Sin táctica: p99 |
 | ------- | --------------------- | ---------------- | --------------------- | ---------------- |
-| 1       | [  1.31 µs ]          | [2.50 µs ]       | [ 0.61 µs ]           | [ 1.10 µs ]      |
-| 2       | [  1.26 µs ]          | [3.90 µs ]       | [ 0.70 µs ]           | [ 1.90 µs ]      |
-| 3       | [  1.35 µs ]          | [2.70 µs ]       | [ 0.71 µs ]           | [ 1.60 µs ]      |
-| 4       | [  1.29 µs ]          | [2.80 µs ]       | [ 0.70 µs ]           | [ 1.60 µs ]      |
-| 5       | [  1.30 µs ]          | [2.60 µs ]       | [ 0.72 µs ]           | [ 2.00 µs ]      |
-| **Promedio de las 5** |
-          |**[ 1.30 µs ]**        | **[ 2.90 µs ]**  | **[ 0.69 µs ]**       | **[ 1.64 µs ]**  |
+| 1       | 1,31                  | 2,50             | 0,61                  | 1,10             |
+| 2       | 1,26                  | 3,90             | 0,70                  | 1,90             |
+| 3       | 1,35                  | 2,70             | 0,71                  | 1,60             |
+| 4       | 1,29                  | 2,80             | 0,70                  | 1,60             |
+| 5       | 1,30                  | 2,60             | 0,72                  | 2,00             |
+| **Promedio** | **1,30**         | **2,90**         | **0,69**              | **1,64**         |
 
-Diferencia: la táctica suma **[ 0.61 µs ] ** al promedio y **[ 1.26 µs ]** al p99 por evento. Con el repositorio en memoria el costo es una lectura de un `Map`; con Redis (servicio `tiempo-real`) la lectura será una ida a la red, y ese costo no está medido aquí.
+Diferencia: la táctica suma **0,61 µs** al promedio y **1,26 µs** al p99 por evento. Con el repositorio en memoria el costo es una lectura de un `Map`; con Redis (servicio `tiempo-real`) la lectura será una ida a la red, y ese costo no está medido aquí.
 
 Resultado del escenario según la versión (modo `con-falla`):
 
 | Versión       | Buses con su posición más reciente | Alertas duplicadas | Resultado |
 | ------------- | ---------------------------------- | ------------------ | --------- |
 | Con táctica   | 350/350 (100 %)                    | 0                  | Cumplido  |
-| Sin táctica   | [35/350 (10 %)]                    | [501]              | No cumplido |
+| Sin táctica   | 35/350 (10 %)                      | 501                | No cumplido |
+
+**Código agregado:** la táctica agrega **7 líneas de código** en `src/aplicacion/procesar-posicion.js` (la lectura de `repo.obtener` y las dos comparaciones), 11 contando el comentario actualizado (commit `2384563`).
 
 ## Limitación conocida: reloj adelantado
 
 Last-write-wins confía en el reloj de la fuente. Si un bus reporta una vez con el reloj en el futuro, ese `timestamp` queda guardado como "el más reciente" y todos sus eventos legítimos posteriores se descartan como `'atrasado'`. El escenario `npm run escenario:reloj-adelantado` lo muestra: 349/350 buses con su posición más reciente, y el escenario no se cumple. Esta limitación se acepta por ahora y se mitigaría validando el `timestamp` contra la hora del gateway al ingresar el evento.
+
+## Cómo se verifica
+
+```bash
+npm run escenario            # con la falla de red: debe decir ESCENARIO CUMPLIDO
+npm run escenario:sin-falla  # sin la falla: debe decir ESCENARIO CUMPLIDO
+```
+
+La condición de éxito está en `test/escenario-desorden.js`: 100 % de los buses con su posición más reciente y 0 alertas duplicadas; si no se cumple, el proceso termina con código 1. La versión sin táctica se puede ver fallar con `git checkout 5a521e2` y `npm run escenario`.
 
 ## Consecuencias
 
