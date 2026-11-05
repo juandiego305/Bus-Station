@@ -8,7 +8,7 @@ Implementación de la arquitectura orientada a eventos definida en el
 (`PosicionReportada`) se publica en Kafka; todo lo demás son consumidores
 independientes de ese evento, cada uno con su propio contrato de consistencia.
 
-**Video de sustentación (segundo previo):** [PEGAR AQUÍ EL ENLACE DE YOUTUBE (oculto)]
+**Video de sustentación (segundo previo):** https://youtu.be/T3_4ox7MvfU
 
 ## Escenario de calidad elegido
 
